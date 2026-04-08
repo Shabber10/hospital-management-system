@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
+// mocked data
 import { toast } from "sonner";
 import { Heart, Activity, Thermometer, Droplets } from "lucide-react";
 
@@ -10,10 +9,10 @@ interface PatientDashboardProps {
 
 export function PatientDashboard({ profile }: PatientDashboardProps) {
   const [activeTab, setActiveTab] = useState("overview");
-  const appointments = useQuery(api.appointments.getPatientAppointments) || [];
-  const medicalRecords = useQuery(api.patients.getPatientMedicalRecords) || [];
-  const prescriptions = useQuery(api.patients.getPatientPrescriptions) || [];
-  const doctors = useQuery(api.doctors.getAllDoctors) || [];
+  const appointments: any[] = [];
+  const medicalRecords: any[] = [];
+  const prescriptions: any[] = [];
+  const doctors: any[] = [];
 
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState("");
@@ -24,13 +23,8 @@ export function PatientDashboard({ profile }: PatientDashboardProps) {
     notes: "",
   });
 
-  const createAppointment = useMutation(api.appointments.createAppointment);
-  const availableSlots = useQuery(
-    api.appointments.getAvailableSlots,
-    selectedDoctor && bookingData.appointmentDate
-      ? { doctorId: selectedDoctor as any, date: bookingData.appointmentDate }
-      : "skip"
-  );
+  const createAppointment = async (data: any) => {};
+  const availableSlots: string[] = ["10:00 AM", "11:00 AM", "2:00 PM"];
 
   const handleBookAppointment = async (e: React.FormEvent) => {
     e.preventDefault();

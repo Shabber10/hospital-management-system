@@ -1,15 +1,12 @@
-port: 5432
-
 // backend/db.js
-import pkg from "pg";
-const { Pool } = pkg;
+require('dotenv').config();
+const { Pool } = require("pg");
+
+const isProduction = process.env.NODE_ENV === "production";
 
 const pool = new Pool({
-  user: "postgres",
-  host: "127.0.0.1",
-  database: "hospitaldb",
-  password: "honey@12396",
-  port: 5432
+  connectionString: process.env.DATABASE_URL,
+  ssl: isProduction ? { rejectUnauthorized: false } : false,
 });
 
 export default pool;

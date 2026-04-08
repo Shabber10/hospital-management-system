@@ -6,15 +6,13 @@
   "scripts": {
     "dev": "npm-run-all --parallel dev:frontend dev:backend",
     "dev:frontend": "vite --open",
-    "dev:backend": "convex dev",
+    "dev:backend": "node backend/server.js",
     "build": "vite build",
-    "lint": "tsc -p convex -noEmit --pretty false && tsc -p . -noEmit --pretty false && convex dev --once && vite build"
+    "lint": "tsc -p . -noEmit --pretty false && vite build"
   },
   "dependencies": {
-    "@convex-dev/auth": "^0.0.80",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "convex": "^1.24.2",
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.552.0",
     "react": "^19.0.0",

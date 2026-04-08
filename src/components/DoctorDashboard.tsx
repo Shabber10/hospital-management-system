@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
+// mocked data
 import { toast } from "sonner";
 
 interface DoctorDashboardProps {
@@ -9,8 +8,8 @@ interface DoctorDashboardProps {
 
 export function DoctorDashboard({ profile }: DoctorDashboardProps) {
   const [activeTab, setActiveTab] = useState("overview");
-  const appointments = useQuery(api.appointments.getDoctorAppointments) || [];
-  const patients = useQuery(api.doctors.getDoctorPatients) || [];
+  const appointments: any[] = [];
+  const patients: any[] = [];
 
   const [showRecordForm, setShowRecordForm] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState("");
@@ -32,9 +31,9 @@ export function DoctorDashboard({ profile }: DoctorDashboardProps) {
     instructions: "",
   });
 
-  const createMedicalRecord = useMutation(api.medicalRecords.createMedicalRecord);
-  const createPrescription = useMutation(api.medicalRecords.createPrescription);
-  const updateAppointmentStatus = useMutation(api.appointments.updateAppointmentStatus);
+  const createMedicalRecord = async (data: any) => { return "dummy-id" };
+  const createPrescription = async (data: any) => {};
+  const updateAppointmentStatus = async (data: any) => {};
 
   const handleCreateRecord = async (e: React.FormEvent) => {
     e.preventDefault();

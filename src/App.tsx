@@ -1,5 +1,4 @@
-import { Authenticated, Unauthenticated, useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
+import { useState, useEffect } from "react";
 import { SignInForm } from "./SignInForm";
 import { SignOutButton } from "./SignOutButton";
 import { Toaster } from "sonner";
@@ -9,17 +8,15 @@ import { AppShell } from "./components/AppShell";
 import { AnimatedBackground } from "./components/AnimatedBackground";
 import { motion } from "framer-motion";
 import { fadeIn, slideUp } from "./lib/motion-variants";
-import { BrowserRouter, Routes, Route, Link, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import ForgotPassword from "./pages/ForgotPassword";
+import axios from "axios";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* OTP-based Forgot Password page (standalone, no AppShell) */}
         <Route path="/forgot-password" element={<ForgotPassword />} />
-
-        {/* Main app (all other routes) */}
         <Route path="*" element={<MainApp />} />
       </Routes>
     </BrowserRouter>
@@ -27,36 +24,43 @@ export default function App() {
 }
 
 function MainApp() {
+  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || 'null'));
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setUser(JSON.parse(localStorage.getItem('user') || 'null'));
+    };
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('user-login', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('user-login', handleStorageChange);
+    };
+  }, []);
+
   return (
-    <AppShell rightAction={<Authenticated><SignOutButton /></Authenticated>}>
+    <AppShell rightAction={user ? <SignOutButton /> : <div />}>
       <AnimatedBackground />
-      <Content />
+      <Content user={user} />
       <Toaster />
     </AppShell>
   );
 }
 
-function Content() {
-  const loggedInUser = useQuery(api.auth.loggedInUser);
-  const patientProfile = useQuery(api.patients.getPatientProfile);
-  const doctorProfile = useQuery(api.doctors.getDoctorProfile);
+function Content({ user }: { user: any }) {
+  const [profile, setProfile] = useState<any>(null);
 
-  if (loggedInUser === undefined) {
+  useEffect(() => {
+    if (user?.email && user?.role?.toLowerCase() === 'patient') {
+      axios.get(`http://localhost:5000/api/patient-details/${user.email}`)
+        .then(res => setProfile(res.data))
+        .catch(err => console.error(err));
+    }
+  }, [user]);
+
+  if (!user) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          <p className="text-sm text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-      {/* ===================== UNAUTHENTICATED VIEW ===================== */}
-      <Unauthenticated>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div
           className="min-h-screen w-full flex items-center justify-center p-6 rounded-xl"
           style={{
@@ -98,20 +102,27 @@ function Content() {
             </motion.div>
           </motion.div>
         </div>
-      </Unauthenticated>
+      </div>
+    );
+  }
 
-      {/* ===================== AUTHENTICATED VIEW ===================== */}
-      <Authenticated>
-        {!patientProfile && !doctorProfile ? (
-          <ProfileSetup />
-        ) : (
-          <Dashboard
-            user={loggedInUser}
-            patientProfile={patientProfile}
-            doctorProfile={doctorProfile}
-          />
-        )}
-      </Authenticated>
+  // Handle case where patient profile is not yet filled
+  if (user?.role?.toLowerCase() === 'patient' && profile === null) {
+    return (
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <ProfileSetup />
+      </div>
+    );
+  }
+
+  // user is logged in
+  return (
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <Dashboard
+        user={user}
+        patientProfile={user?.role?.toLowerCase() === 'patient' ? (profile || {}) : null}
+        doctorProfile={user?.role?.toLowerCase() === 'doctor' ? {} : null}
+      />
     </div>
   );
 }

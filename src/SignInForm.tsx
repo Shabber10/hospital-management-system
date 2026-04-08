@@ -1,5 +1,5 @@
 "use client";
-import { useAuthActions } from "@convex-dev/auth/react";
+import axios from "axios";
 import { useState } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -9,10 +9,35 @@ import { Button } from "./components/ui/button";
 import { slideUp, stagger, tap } from "@/lib/motion-variants";
 
 export function SignInForm() {
-  const { signIn } = useAuthActions();
   const [flow, setFlow] = useState<"signIn" | "signUp">("signIn");
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSubmitting(true);
+    const formData = new FormData(e.target as HTMLFormElement);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    try {
+      if (flow === "signIn") {
+        const res = await axios.post("http://localhost:5000/api/login", { email, password });
+        localStorage.setItem("user", JSON.stringify(res.data));
+        window.dispatchEvent(new Event("user-login"));
+        toast.success("Successfully logged in");
+      } else {
+        const role = "Patient"; // Default role
+        await axios.post("http://localhost:5000/api/register", { email, password, role });
+        toast.success("Account created! You can now sign in.");
+        setFlow("signIn");
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "An error occurred");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     
@@ -24,25 +49,7 @@ export function SignInForm() {
     >
       <form
         className="flex flex-col gap-form-field"
-        onSubmit={(e) => {
-          e.preventDefault();
-          setSubmitting(true);
-          const formData = new FormData(e.target as HTMLFormElement);
-          formData.set("flow", flow);
-          void signIn("password", formData).catch((error) => {
-            let toastTitle = "";
-            if (error.message.includes("Invalid password")) {
-              toastTitle = "Invalid password. Please try again.";
-            } else {
-              toastTitle =
-                flow === "signIn"
-                  ? "Could not sign in, did you mean to sign up?"
-                  : "Could not sign up, did you mean to sign in?";
-            }
-            toast.error(toastTitle);
-            setSubmitting(false);
-          });
-        }}
+        onSubmit={handleSubmit}
       >
         <motion.div variants={slideUp} className="relative">
           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -113,7 +120,10 @@ export function SignInForm() {
         <Button
           variant="glass"
           className="w-full"
-          onClick={() => void signIn("anonymous")}
+          onClick={() => {
+            localStorage.setItem("user", JSON.stringify({ email: "guest@careweave.com", role: "Patient" }));
+            window.dispatchEvent(new Event("user-login"));
+          }}
         >
           <User className="h-4 w-4 mr-2" />
           Sign in anonymously

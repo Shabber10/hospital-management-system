@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import axios from "axios";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { User, Stethoscope, ArrowLeft } from "lucide-react";
@@ -47,8 +46,23 @@ export function ProfileSetup() {
     availableTo: "",
   });
 
-  const createPatientProfile = useMutation(api.patients.createPatientProfile);
-  const createDoctorProfile = useMutation(api.doctors.createDoctorProfile);
+  // Use Axios to create profile via local Express server
+  const createPatientProfile = async (data: any) => {
+    // In a real application, POST to /api/patient-details
+    const userString = localStorage.getItem("user");
+    if (!userString) throw new Error("No user logged in");
+    const user = JSON.parse(userString);
+    await axios.post("http://localhost:5000/api/patient-details", { email: user.email, ...data});
+    window.location.reload(); // Quick refresh to clear null profile state
+  };
+  const createDoctorProfile = async (data: any) => {
+    // Similarly for doctors, we could save local metadata or post to a new endpoint
+    const userString = localStorage.getItem("user");
+    if (!userString) throw new Error("No user logged in");
+    const user = JSON.parse(userString);
+    await axios.post("http://localhost:5000/api/patient-details", { email: user.email, ...data});
+    window.location.reload();
+  };
 
   const handlePatientSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
