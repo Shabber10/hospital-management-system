@@ -1,29 +1,50 @@
-# CareWeave IQ Authentication System
-  
-This is a project built with [Chef](https://chef.convex.dev) using [Convex](https://convex.dev) as its backend.
- You can find docs about Chef with useful information like how to deploy to production [here](https://docs.convex.dev/chef).
-  
-This project is connected to the Convex deployment named [`judicious-bee-606`](https://dashboard.convex.dev/d/judicious-bee-606).
-  
-## Project structure
-  
-The frontend code is in the `app` directory and is built with [Vite](https://vitejs.dev/).
-  
-The backend code is in the `convex` directory.
-  
-`npm run dev` will start the frontend and backend servers.
+# CareWeave Healthcare Platform 🏥
 
-## App authentication
+A unified, premium healthcare management system created by combining **CareWeave IQ 2.0** and **Hospital Management System**.
 
-Chef apps use [Convex Auth](https://auth.convex.dev/) with Anonymous auth for easy sign in. You may wish to change this before deploying your app.
+## 🚀 Features
 
-## Developing and deploying your app
+- **🛡️ Unified Authentication**: Secure login/register with role selection (Patient, Doctor, Admin).
+- **🔐 Advanced Recovery**: 3-step OTP-based password reset system.
+- **💓 Patient Dashboard**: Real-time health vitals (Heart Rate, BP, Temp, Sugar) + Medical Records & Prescriptions.
+- **👨‍⚕️ Doctor Dashboard**: Manage appointments, patient history, and create prescriptions.
+- **👑 Admin Dashboard**: Full user management and platform statistics.
+- **🧠 Intelligent Backend**: Powered by Convex (Serverless) and Node.js/Express.
 
-Check out the [Convex docs](https://docs.convex.dev/) for more information on how to develop with Convex.
-* If you're new to Convex, the [Overview](https://docs.convex.dev/understanding/) is a good place to start
-* Check out the [Hosting and Deployment](https://docs.convex.dev/production/) docs for how to deploy your app
-* Read the [Best Practices](https://docs.convex.dev/understanding/best-practices/) guide for tips on how to improve you app further
+## 📁 Project Structure
 
-## HTTP API
+```
+CareWeave-Healthcare-Platform/
+├── src/                  ← Vite + React 19 Frontend
+│   ├── components/       ← Unified React components
+│   └── pages/            ← Auth and specialized pages
+├── backend/              ← Node.js/Express (OTP & User API)
+├── convex/               ← Convex serverless functions & DB
+└── index.html            ← Premium landing UI
+```
 
-User-defined http routes are defined in the `convex/router.ts` file. We split these routes into a separate file from `convex/http.ts` to allow us to prevent the LLM from modifying the authentication routes.
+## 🛠️ Getting Started
+
+### 1. Initial Setup
+```bash
+npm install
+cd backend && npm install
+```
+
+### 2. Run Locally
+```bash
+# In the root folder
+npm run dev
+```
+
+### 3. Start OTP Server
+```bash
+cd backend
+node server.js
+```
+
+## 🌐 Deployment
+This project is ready to be deployed on **Vercel** or **Netlify**. Ensure you set your `VITE_CONVEX_URL` in the environment variables.
+
+---
+*Created by Shabber Hussain*
