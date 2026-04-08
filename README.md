@@ -2,7 +2,9 @@
 
 A unified, premium healthcare management system created by combining **CareWeave IQ 2.0** and **Hospital Management System**.
 
-### 🔗 [Live Demo](https://hospital-management-system-opal-zeta.vercel.app)
+### 🚀 Getting Started
+
+To see this app live, follow the [Deployment Guide](#🌐-deployment) below to host it on Vercel.
 
 ## 🚀 Features
 
